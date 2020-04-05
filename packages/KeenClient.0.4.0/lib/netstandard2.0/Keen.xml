@@ -1,0 +1,1951 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Keen</name>
+    </assembly>
+    <members>
+        <member name="T:Keen.Core.DynamicPropertyValue">
+            <summary>
+            An instance of DynamicPropertyValue containing a delegate 
+            can be added to the GlobalProperties collection. When AddEvent
+            inserts GlobalProperties into an event, the delegate will be
+            executed to provide the value of the property.
+            </summary>
+        </member>
+        <member name="M:Keen.Core.DynamicPropertyValue.Value">
+            <summary>
+            Call the delegate that produces the property value
+            </summary>
+            <returns>The value produced by the delegate</returns>
+        </member>
+        <member name="M:Keen.Core.DynamicPropertyValue.#ctor(System.Func{System.Object})">
+            <summary>
+            
+            </summary>
+            <param name="value">A delegate that will be called each time the property value is required</param>
+        </member>
+        <member name="T:Keen.Core.Event">
+            <summary>
+            Event implements the IEvent interface which represents the Keen.IO Event API methods.
+            </summary>
+        </member>
+        <member name="M:Keen.Core.Event.GetSchemas">
+            <summary>
+            Get details of all schemas in the project.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.Event.AddEvents(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Add all events in a single request.
+            </summary>
+            <param name="events"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Keen.Core.EventCacheMemory">
+            <summary>
+            <para>This is a simple memory-based cache provider. It has no cache-expiration policy.
+            To use, pass an instance of this class when constructing KeenClient</para>
+            <seealso cref="T:Keen.Core.KeenClient"/>
+            </summary>
+        </member>
+        <member name="T:Keen.Core.EventCachePortable">
+            <summary>
+            <para>EventCachePortable implements the IEventCache interface using
+            file-based storage. It has no cache-expiration policy.</para>
+            <para>To use, pass an instance of this class when constructing KeenClient.
+            To construct a new instance, call the static New() method.</para>
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "P:Keen.Core.EventCachePortable.InstanceAsync" -->
+        <member name="M:Keen.Core.EventCachePortable.CreateInstanceAsync">
+            <summary>
+            Create, initialize and return an instance of EventCachePortable.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.EventCachePortable.InitializeAsync">
+            <summary>
+            Initialize an instance by ensuring the cache path exists,
+            then read all existing cached events into the in-memory queue.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.EventCachePortable.ClearAsync">
+            <summary>
+            Clears all events from the cache.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.EventCachePortable.AddAsync(Keen.EventCache.CachedEvent)">
+            <summary>
+            Adds an event to the cache.
+            </summary>
+            <returns></returns>
+            <param name="e">The CachedEvent to add to the cache.</param>
+        </member>
+        <member name="T:Keen.Core.EventCollection">
+            <summary>
+            EventCollection implements the IEventCollection interface which represents the Keen.IO
+            EventCollection API methods.
+            </summary>
+        </member>
+        <member name="T:Keen.Core.HttpClientCache">
+            <summary>
+            An implementation of <see cref="T:Keen.Core.IHttpClientProvider"/> that caches HttpClient instances in
+            a dictionary mapping the base URL to a WeakReference to the actual instance. A PRO to this
+            approach is that HttpClient instances will automatically be evicted when no more strong
+            refs exist and the GC collects. A CON to using WeakReference, besides it not being generic
+            in the current version of the PCL and being a fairly heavyweight class, is that rapid 
+            creation and releasing of owning instances like the KeenClient can still allow for the GC
+            to aggressively clean up HttpClient instances. Recommended usage of KeenClient shouldn't
+            make this a common problem, but at some point this cache can evolve to be more intelligent
+            about keeping instances alive deliberately.
+            </summary>
+        </member>
+        <member name="P:Keen.Core.HttpClientCache.Item(System.Uri)">
+            <summary>
+            Retrieve an existing HttpClient for the given URL, or throw if it doesn't exist.
+            </summary>
+            <param name="baseUrl">The base URL the HttpClient is tied to.</param>
+            <returns>The HttpClient which is expected to exist.</returns>
+        </member>
+        <member name="M:Keen.Core.HttpClientCache.GetOrCreateForUrl(System.Uri,System.Func{System.Net.Http.HttpMessageHandler},System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,System.String}})">
+            <summary>
+            Retrieve an existing HttpClient for the given URL, or create one with the given
+            handlers and headers.
+            </summary>
+            <param name="baseUrl">The base URL the HttpClient is tied to.</param>
+            <param name="getHandlerChain">A factory function to create a handler chain.</param>
+            <param name="defaultHeaders">Any headers that all requests to this URL should add by
+                default.</param>
+            <returns>An HttpClient configured to handle requests for the given URL.</returns>
+        </member>
+        <member name="M:Keen.Core.HttpClientCache.GetOrCreateForUrl(System.Uri,System.Func{System.Net.Http.HttpMessageHandler},System.Action{System.Net.Http.HttpClient})">
+            <summary>
+            Retrieve an existing HttpClient for the given URL, or create one with the given
+            handlers and configuration functor.
+            </summary>
+            <param name="baseUrl">The base URL the HttpClient is tied to.</param>
+            <param name="getHandlerChain">A factory function to create a handler chain.</param>
+            <param name="configure">An action that takes the newly created HttpClient and
+                configures it however needed before it is stored and/or returned.</param>
+            <returns>An HttpClient configured to handle requests for the given URL.</returns>
+        </member>
+        <member name="M:Keen.Core.HttpClientCache.RemoveForUrl(System.Uri)">
+            <summary>
+            Remove any cached HttpClients associated with the given URL.
+            </summary>
+            <param name="baseUrl">The base URL for which any cached HttpClient instances should
+                be purged.</param>
+        </member>
+        <member name="M:Keen.Core.HttpClientCache.ExistsForUrl(System.Uri)">
+            <summary>
+            Can this provider return an HttpClient instance for the given URL? For this
+            implementation, we'll check if an entry exists in the cache and if the WeakReference
+            is still valid and a strong ref can be taken.
+            </summary>
+            <param name="baseUrl">The base URL for which we'd like to know if an HttpClient can be
+                provided.</param>
+            <returns>True if this provider could return an HttpClient for the given URL, false
+                otherwise.</returns>
+        </member>
+        <member name="M:Keen.Core.HttpClientCache.Clear">
+            <summary>
+            Drop all HttpClient instances from the cache, no matter the URL.
+            </summary>
+        </member>
+        <member name="M:Keen.Core.HttpClientCache.OverrideForUrl(System.Uri,System.Net.Http.HttpClient)">
+            <summary>
+            Override the HttpClient provided for a given URL. This tests and replaces or inserts
+            all in one atomic operation. This will likely be useful for testing.
+            </summary>
+            <param name="baseUrl">URL to override.</param>
+            <param name="httpClient">HttpClient instance that will do the overriding.</param>
+        </member>
+        <member name="M:Keen.Core.IEvent.GetSchemas">
+            <summary>
+            Return schema information for all the event collections in this project.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.IEvent.AddEvents(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Insert multiple events in one or more collections in a single request.
+            </summary>
+            <param name="events"></param>
+            <returns>Enumerable containing any rejected events</returns>
+        </member>
+        <member name="M:Keen.Core.IEventCollection.GetSchema(System.String)">
+            <summary>
+            Returns schema information for this event collection.
+            </summary>
+            <param name="collection"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.IEventCollection.DeleteCollection(System.String)">
+            <summary>
+            Delete the entire event collection.
+            </summary>
+            <param name="collection">Name of collection</param>
+        </member>
+        <member name="M:Keen.Core.IEventCollection.AddEvent(System.String,Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Insert one event at a time in a single request.
+            </summary>
+            <param name="collection">Name of collection</param>
+            <param name="anEvent">Event data to insert</param>
+            <returns></returns>
+        </member>
+        <member name="T:Keen.Core.IHttpClientProvider">
+            <summary>
+            Represents a type that can provide an HttpClient for a given URL. It could act as a cache
+            by returning pre-existing instances, or create as necessary, or always create given the
+            optional configuration parameters pass in.
+            </summary>
+        </member>
+        <member name="P:Keen.Core.IHttpClientProvider.Item(System.Uri)">
+            <summary>
+            Retrieve an existing HttpClient for the given URL.
+            </summary>
+            <param name="baseUrl">The base URL the HttpClient is tied to.</param>
+            <returns>The HttpClient which is expected to exist.</returns>
+        </member>
+        <member name="M:Keen.Core.IHttpClientProvider.GetOrCreateForUrl(System.Uri,System.Func{System.Net.Http.HttpMessageHandler},System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,System.String}})">
+            <summary>
+            Retrieve an existing HttpClient for the given URL, or create one with the given
+            handlers and configuration functor.
+            </summary>
+            <param name="baseUrl">The base URL the HttpClient is tied to.</param>
+            <param name="getHandlerChain">A factory function to create a handler chain.</param>
+            <param name="defaultHeaders">Any headers that all requests to this URL should add by
+                default.</param>
+            <returns>An HttpClient configured to handle requests for the given URL.</returns>
+        </member>
+        <member name="M:Keen.Core.IHttpClientProvider.GetOrCreateForUrl(System.Uri,System.Func{System.Net.Http.HttpMessageHandler},System.Action{System.Net.Http.HttpClient})">
+            <summary>
+            Retrieve an existing HttpClient for the given URL, or create one with the given
+            handlers and configuration functor.
+            </summary>
+            <param name="baseUrl">The base URL the HttpClient is tied to.</param>
+            <param name="getHandlerChain">A factory function to create a handler chain.</param>
+            <param name="configure">An action that takes the newly created HttpClient and
+                configures it however needed before it is stored and/or returned.</param>
+            <returns>An HttpClient configured to handle requests for the given URL.</returns>
+        </member>
+        <member name="M:Keen.Core.IHttpClientProvider.RemoveForUrl(System.Uri)">
+            <summary>
+            If caching instances, remove any associated with the given URL.
+            </summary>
+            <param name="baseUrl">The base URL for which any cached HttpClient instances should
+                be purged.</param>
+        </member>
+        <member name="M:Keen.Core.IHttpClientProvider.ExistsForUrl(System.Uri)">
+            <summary>
+            Can this provider return an HttpClient instance for the given URL?
+            </summary>
+            <param name="baseUrl">The base URL for which we'd like to know if an HttpClient can be
+                provided.</param>
+            <returns>True if this provider could return an HttpClient for the given URL, false
+                otherwise.</returns>
+        </member>
+        <member name="T:Keen.Core.IKeenHttpClient">
+            <summary>
+            Represents a type capable of performing HTTP operations destined for a Keen API endpoint.
+            This should augment and/or alter normal HttpClient behavior where appropriate taking into
+            consideration Keen-specific protocols.
+            </summary>
+        </member>
+        <member name="M:Keen.Core.IKeenHttpClient.GetAsync(System.String,System.String)">
+            <summary>
+            Create and send a GET request to the given relative resource using the given key for
+            authentication.
+            </summary>
+            <param name="resource">The relative resource to GET. Must be properly formatted as a
+                relative Uri.</param>
+            <param name="authKey">The key to use for authenticating this request.</param>
+            <returns>The response message.</returns>
+        </member>
+        <member name="M:Keen.Core.IKeenHttpClient.GetAsync(System.Uri,System.String)">
+            <summary>
+            Create and send a GET request to the given relative resource using the given key for
+            authentication.
+            </summary>
+            <param name="resource">The relative resource to GET.</param>
+            <param name="authKey">The key to use for authenticating this request.</param>
+            <returns>The response message.</returns>
+        </member>
+        <member name="M:Keen.Core.IKeenHttpClient.PostAsync(System.String,System.String,System.String)">
+            <summary>
+            Create and send a POST request with the given content to the given relative resource
+            using the given key for authentication. 
+            </summary>
+            <param name="resource">The relative resource to POST. Must be properly formatted as a
+                relative Uri.</param>
+            <param name="authKey">The key to use for authenticating this request.</param>
+            <param name="content">The POST body to send.</param>
+            <returns>The response message.</returns>
+        </member>
+        <member name="M:Keen.Core.IKeenHttpClient.PostAsync(System.Uri,System.String,System.String)">
+            <summary>
+            Create and send a POST request with the given content to the given relative resource
+            using the given key for authentication. 
+            </summary>
+            <param name="resource">The relative resource to POST.</param>
+            <param name="authKey">The key to use for authenticating this request.</param>
+            <param name="content">The POST body to send.</param>
+            <returns>The response message.</returns>
+        </member>
+        <member name="M:Keen.Core.IKeenHttpClient.DeleteAsync(System.String,System.String)">
+            <summary>
+            Create and send a DELETE request to the given relative resource using the given key for
+            authentication.
+            </summary>
+            <param name="resource">The relative resource to DELETE. Must be properly formatted as a
+                relative Uri.</param>
+            <param name="authKey">The key to use for authenticating this request.</param>
+            <returns>The response message.</returns>
+        </member>
+        <member name="M:Keen.Core.IKeenHttpClient.DeleteAsync(System.Uri,System.String)">
+            <summary>
+            Create and send a DELETE request to the given relative resource using the given key for
+            authentication.
+            </summary>
+            <param name="resource">The relative resource to DELETE.</param>
+            <param name="authKey">The key to use for authenticating this request.</param>
+            <returns>The response message.</returns>
+        </member>
+        <member name="M:Keen.Core.IKeenHttpClient.PutAsync(System.String,System.String,System.String)">
+            <summary>
+            Create and send a PUT request with the given content to the given relative resource
+            using the given key for authentication. 
+            </summary>
+            <param name="resource">The relative resource to PUT. Must be properly formatted as a
+                relative Uri.</param>
+            <param name="authKey">The key to use for authenticating this request.</param>
+            <param name="content">The PUT body to send.</param>
+            <returns>>The response message.</returns>
+        </member>
+        <member name="M:Keen.Core.IKeenHttpClient.PutAsync(System.Uri,System.String,System.String)">
+            <summary>
+            Create and send a PUT request with the given content to the given relative resource
+            using the given key for authentication. 
+            </summary>
+            <param name="resource">The relative resource to PUT. Must be properly formatted as a
+                relative Uri.</param>
+            <param name="authKey">The key to use for authenticating this request.</param>
+            <param name="content">The PUT body to send.</param>
+            <returns>>The response message.</returns>
+        </member>
+        <member name="T:Keen.Core.IKeenHttpClientProvider">
+            <summary>
+            An instance of this type can provide an <see cref="T:Keen.Core.IKeenHttpClient"/> to be used to perform
+            requests against a given URL. Implement to customize how other parts of the SDK dispatch
+            requests to a keen IO endpoint.
+            </summary>
+        </member>
+        <member name="M:Keen.Core.IKeenHttpClientProvider.GetForUrl(System.Uri)">
+            <summary>
+            Given a base URL, return an IKeenHttpClient against which requests can be made. The
+            intent is that all requests using this IKeenHttpClient will be to resources relative to
+            this base URL. It is expected that this IKeenHttpClient is thread-safe.
+            </summary>
+            <param name="baseUrl">The base URL, e.g. https://api.keen.io/3.0/ </param>
+            <returns>An IKeenHttpClient configured to handle requests to resources relative to the
+                given base URL.</returns>
+        </member>
+        <member name="T:Keen.Core.IProjectSettings">
+            <summary>
+            Values required to access a Keen project
+            </summary>
+        </member>
+        <member name="P:Keen.Core.IProjectSettings.KeenUrl">
+            <summary>
+            The Keen.IO URL for this project. Usually this will be the
+            server address and API version. This should end with a '/'.
+            
+            - e.g. https://api.keen.io/3.0/
+            
+            </summary>
+        </member>
+        <member name="P:Keen.Core.IProjectSettings.ProjectId">
+            <summary>
+            The Project ID, identifying the data silo to be accessed.
+            </summary>
+        </member>
+        <member name="P:Keen.Core.IProjectSettings.MasterKey">
+            <summary>
+            The Master API key, required for getting a collection schema
+            or deleting the entire event collection.
+            </summary>
+        </member>
+        <member name="P:Keen.Core.IProjectSettings.WriteKey">
+            <summary>
+            The Write API key, required for inserting events.
+            </summary>
+        </member>
+        <member name="P:Keen.Core.IProjectSettings.ReadKey">
+            <summary>
+            The Read API key, used with query requests.
+            </summary>
+        </member>
+        <member name="T:Keen.Core.KeenClient">
+            <summary>
+            Keen.IO API access
+            </summary>
+        </member>
+        <member name="P:Keen.Core.KeenClient.EventCollection">
+            <summary>
+            EventCollection provides direct access to the Keen.IO EventCollection API methods.
+            It is not normally necessary to use this property.
+            The default implementation can be overridden by setting a new implementation here.
+            </summary>
+        </member>
+        <member name="P:Keen.Core.KeenClient.Event">
+            <summary>
+            Event provides direct access to the Keen.IO Event API methods.
+            It is not normally necessary to use this property.
+            The default implementation can be overridden by setting a new implementation here.
+            </summary>
+        </member>
+        <member name="P:Keen.Core.KeenClient.EventCache">
+            <summary>
+            EventCache provides a caching implementation allowing events to be cached locally
+            instead of being sent one at a time. It is not normally necessary to use this property.
+            The implementation is responsible for cache maintenance policy, such as trimming 
+            old entries to avoid excessive cache size.
+            </summary>
+        </member>
+        <member name="P:Keen.Core.KeenClient.Queries">
+            <summary>
+            Queries provides direct access to the Keen.IO Queries API methods.
+            It is not normally necessary to use this property.
+            The default implementation can be overridden by setting a new implementation here.
+            </summary>
+        </member>
+        <member name="M:Keen.Core.KeenClient.AddGlobalProperty(System.String,System.Object)">
+            <summary>
+            Add a static global property. This property will be added to
+            every event.
+            </summary>
+            <param name="property">Property name</param>
+            <param name="value">Property value. This may be a simple value, array, or object,
+            or an object that supports IDynamicPropertyValue returning one of those.</param>
+        </member>
+        <member name="M:Keen.Core.KeenClient.#ctor(Keen.Core.IProjectSettings)">
+            <summary>
+            
+            </summary>
+            <param name="prjSettings">A ProjectSettings instance containing the ProjectId and API keys</param>
+        </member>
+        <member name="M:Keen.Core.KeenClient.#ctor(Keen.Core.IProjectSettings,Keen.EventCache.IEventCache)">
+            <summary>
+            
+            </summary>
+            <param name="prjSettings">A ProjectSettings instance containing the ProjectId and API keys</param>
+            <param name="eventCache">An IEventCache instance providing a caching strategy</param>
+        </member>
+        <member name="M:Keen.Core.KeenClient.DeleteCollectionAsync(System.String)">
+            <summary>
+            Delete the specified collection. Deletion may be denied for collections with many events.
+            Master API key is required.
+            </summary>
+            <param name="collection">Name of collection to delete.</param>
+        </member>
+        <member name="M:Keen.Core.KeenClient.DeleteCollection(System.String)">
+            <summary>
+            Delete the specified collection. Deletion may be denied for collections with many events.
+            Master API key is required.
+            </summary>
+            <param name="collection">Name of collection to delete.</param>
+        </member>
+        <member name="M:Keen.Core.KeenClient.GetSchemasAsync">
+            <summary>
+            Return schema information for all the event collections in this project.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.GetSchemas">
+            <summary>
+            Return schema information for all the event collections in this project.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.GetSchemaAsync(System.String)">
+            <summary>
+            Retrieve the schema for the specified collection. This requires
+            a value for the project settings Master API key.
+            </summary>
+            <param name="collection"></param>
+        </member>
+        <member name="M:Keen.Core.KeenClient.GetSchema(System.String)">
+            <summary>
+            Retrieve the schema for the specified collection. This requires
+            a value for the project settings Master API key.
+            </summary>
+            <param name="collection"></param>
+        </member>
+        <member name="M:Keen.Core.KeenClient.AddEvents(System.String,System.Collections.Generic.IEnumerable{System.Object},System.Collections.Generic.IEnumerable{Keen.DataEnrichment.AddOn})">
+            <summary>
+            Insert multiple events in a single request.
+            </summary>
+            <param name="collection">Collection name</param>
+            <param name="eventsInfo">Collection of events to add</param>
+            <param name="addOns">Optional collection of Data Enhancement Add-ons</param>
+        </member>
+        <member name="M:Keen.Core.KeenClient.AddEventsBulkAsync(System.String,System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Add a collection of events to the specified collection. Assumes that
+            objects in the collection have already been through AddEvent to receive
+            global properties. 
+            </summary>
+            <param name="collection">Collection name</param>
+            <param name="eventsInfo">Collection of events to add</param>
+            <returns>Enumerable of any rejected events</returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.AddEventsAsync(System.String,System.Collections.Generic.IEnumerable{System.Object},System.Collections.Generic.IEnumerable{Keen.DataEnrichment.AddOn})">
+            <summary>
+            Add a collection of events to the specified collection
+            </summary>
+            <param name="collection">Collection name</param>
+            <param name="eventsInfo">Collection of events to add</param>
+            <param name="addOns">Optional collection of Data Enhancement Add-ons</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.AddEventAsync(System.String,System.Object,System.Collections.Generic.IEnumerable{Keen.DataEnrichment.AddOn})">
+            <summary>
+            Add a single event to the specified collection.
+            </summary>
+            <param name="collection">Collection name</param>
+            <param name="eventInfo">The event to add.</param>
+            <param name="addOns">Optional collection of Data Enhancement Add-ons</param>
+        </member>
+        <member name="M:Keen.Core.KeenClient.PrepareUserObject(System.Object,System.Collections.Generic.IEnumerable{Keen.DataEnrichment.AddOn})">
+            <summary>
+            Convert a user-supplied object to a JObject that can be sent to the Keen.IO API.
+            
+            This writes any global properties to the object and records the time.
+            </summary>
+            <param name="eventInfo"></param>
+            <param name="addOns">Optional collection of Data Enhancement Add-ons</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.AddEvent(System.String,System.Object,System.Collections.Generic.IEnumerable{Keen.DataEnrichment.AddOn})">
+            <summary>
+            Add a single event to the specified collection.
+            </summary>
+            <param name="collection">Collection name</param>
+            <param name="eventInfo">An object representing the event to be added.</param>
+            <param name="addOns">Optional collection of Data Enhancement Add-ons</param>
+        </member>
+        <member name="M:Keen.Core.KeenClient.SendCachedEvents">
+            <summary>
+            Submit all events found in the event cache. If any events are rejected by the server,
+            KeenCacheException will be thrown with a listing of the rejected events, each with
+            the error message it received.
+            </summary>
+        </member>
+        <member name="M:Keen.Core.KeenClient.SendCachedEventsAsync">
+            <summary>
+            Submit all events found in the event cache. If any events are rejected by the server,
+            KeenCacheException will be thrown with a listing of the rejected events, each with
+            the error message it received.
+            </summary>
+        </member>
+        <member name="M:Keen.Core.KeenClient.GetQueriesAsync">
+            <summary>
+            Retrieve a list of all the queries supported by the API.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryAsync(System.String,System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            Call any Keen.IO API function with the specified parameters.
+            </summary>
+            <param name="queryName"></param>
+            <param name="parms"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.Query(System.String,System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            Call any Keen.IO API function with the specified parameters. Refer to Keen API documentation for
+            details of request parameters and return type. Return type may be cast as dynamic.
+            </summary>
+            <param name="queryName">Query name, e.g., KeenConstants.QueryCount</param>
+            <param name="parms">Parameters for query, API keys are not required here.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryAsync(Keen.Query.QueryType,System.String,System.String,Keen.Query.IQueryTimeframe,System.Collections.Generic.IEnumerable{Keen.Query.QueryFilter},System.String)">
+            <summary>
+            Run a query returning a single value.
+            </summary>
+            <param name="queryType">Type of query to run.</param>
+            <param name="collection">Name of event collection to query.</param>
+            <param name="targetProperty">Name of property to analyse.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="filters">Filter to narrow down the events used in analysis. Optional, may be null.</param>
+            <param name="timezone">The timezone to use when specifying a relative timeframe. Optional, may be blank.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.Query(Keen.Query.QueryType,System.String,System.String,Keen.Query.IQueryTimeframe,System.Collections.Generic.IEnumerable{Keen.Query.QueryFilter},System.String)">
+            <summary>
+            Return a single value.
+            </summary>
+            <param name="queryType">Type of query to run.</param>
+            <param name="collection">Name of event collection to query.</param>
+            <param name="targetProperty">Name of property to analyse.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="filters">Filter to narrow down the events used in analysis. Optional, may be null.</param>
+            <param name="timezone">The timezone to use when specifying a relative timeframe. Optional, may be blank.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryGroupAsync(Keen.Query.QueryType,System.String,System.String,System.String,Keen.Query.IQueryTimeframe,System.Collections.Generic.IEnumerable{Keen.Query.QueryFilter},System.String)">
+            <summary>
+            Returns values collected by group.
+            </summary>
+            <param name="queryType">Type of query to run.</param>
+            <param name="collection">Name of event collection to query.</param>
+            <param name="targetProperty">Name of property to analyse.</param>
+            <param name="groupBy">Name of a collection field by which to group results.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="filters">Filter to narrow down the events used in analysis. Optional, may be null.</param>
+            <param name="timezone">The timezone to use when specifying a relative timeframe. Optional, may be blank.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryGroup(Keen.Query.QueryType,System.String,System.String,System.String,Keen.Query.IQueryTimeframe,System.Collections.Generic.IEnumerable{Keen.Query.QueryFilter},System.String)">
+            <summary>
+            Returns values collected by group.
+            </summary>
+            <param name="queryType">Type of query to run.</param>
+            <param name="collection">Name of event collection to query.</param>
+            <param name="targetProperty">Name of property to analyse.</param>
+            <param name="groupBy">Name of a collection field by which to group results.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="filters">Filter to narrow down the events used in analysis. Optional, may be null.</param>
+            <param name="timezone">The timezone to use when specifying a relative timeframe. Optional, may be blank.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryIntervalAsync(Keen.Query.QueryType,System.String,System.String,Keen.Query.IQueryTimeframe,Keen.Query.QueryInterval,System.Collections.Generic.IEnumerable{Keen.Query.QueryFilter},System.String)">
+            <summary>
+            Return values collected by time interval.
+            </summary>
+            <param name="queryType">Type of query to run.</param>
+            <param name="collection">Name of event collection to query.</param>
+            <param name="targetProperty">Name of property to analyse.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="interval">The block size for partitioning the specified timeframe. Optional, may be null.</param>
+            <param name="filters">Filters to narrow down the events used in analysis. Optional, may be null.</param>
+            <param name="timezone">The timezone to use when specifying a relative timeframe. Optional, may be blank.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryInterval(Keen.Query.QueryType,System.String,System.String,Keen.Query.IQueryTimeframe,Keen.Query.QueryInterval,System.Collections.Generic.IEnumerable{Keen.Query.QueryFilter},System.String)">
+            <summary>
+            Returns values collected by time interval.
+            </summary>
+            <param name="queryType">Type of query to run.</param>
+            <param name="collection">Name of event collection to query.</param>
+            <param name="targetProperty">Name of property to analyse.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="interval">The block size for partitioning the specified timeframe. Optional, may be null.</param>
+            <param name="filters">Filters to narrow down the events used in analysis. Optional, may be null.</param>
+            <param name="timezone">The timezone to use when specifying a relative timeframe. Optional, may be blank.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryIntervalGroupAsync(Keen.Query.QueryType,System.String,System.String,System.String,Keen.Query.IQueryTimeframe,Keen.Query.QueryInterval,System.Collections.Generic.IEnumerable{Keen.Query.QueryFilter},System.String)">
+            <summary>
+            Returns items collected by time interval and group.
+            </summary>
+            <param name="queryType">Type of query to run.</param>
+            <param name="collection">Name of event collection to query.</param>
+            <param name="targetProperty">Name of property to analyse.</param>
+            <param name="groupBy">Name of field by which to group results.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="interval">The block size for partitioning the specified timeframe. Optional, may be null.</param>
+            <param name="filters">Filters to narrow down the events used in analysis. Optional, may be null.</param>
+            <param name="timezone">The timezone to use when specifying a relative timeframe. Optional, may be blank.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryIntervalGroup(Keen.Query.QueryType,System.String,System.String,System.String,Keen.Query.IQueryTimeframe,Keen.Query.QueryInterval,System.Collections.Generic.IEnumerable{Keen.Query.QueryFilter},System.String)">
+            <summary>
+            Returns items collected by time interval and group.
+            </summary>
+            <param name="queryType">Type of query to run.</param>
+            <param name="collection">Name of event collection to query.</param>
+            <param name="targetProperty">Name of property to analyse.</param>
+            <param name="groupBy">Name of field by which to group results.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="interval">The block size for partitioning the specified timeframe. Optional, may be null.</param>
+            <param name="filters">Filters to narrow down the events used in analysis. Optional, may be null.</param>
+            <param name="timezone">The timezone to use when specifying a relative timeframe. Optional, may be blank.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryExtractResourceAsync(System.String,Keen.Query.IQueryTimeframe,System.Collections.Generic.IEnumerable{Keen.Query.QueryFilter},System.Int32,System.String)">
+            <summary>
+            Extract full-form event data with all property values. 
+            </summary>
+            <param name="collection">Name of event collection to query.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="filters">Filter to narrow down the events used in analysis. Optional, may be null.</param>
+            <param name="latest">Request up to 100 of the most recent events added to a given collection.</param>
+            <param name="email">If specified, email will be sent when the data is ready for download. Otherwise, it will be returned directly.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryExtractResource(System.String,Keen.Query.IQueryTimeframe,System.Collections.Generic.IEnumerable{Keen.Query.QueryFilter},System.Int32,System.String)">
+            <summary>
+            Extract full-form event data with all property values. 
+            </summary>
+            <param name="collection">Name of event collection to query.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="filters">Filter to narrow down the events used in analysis. Optional, may be null.</param>
+            <param name="latest">Request up to 100 of the most recent events added to a given collection.</param>
+            <param name="email">If specified, email will be sent when the data is ready for download. Otherwise, it will be returned directly.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryFunnelAsync(System.Collections.Generic.IEnumerable{Keen.Query.FunnelStep},Keen.Query.IQueryTimeframe,System.String)">
+            <summary>
+            Funnels count relevant events in succession. See API documentation for details.
+            </summary>
+            <param name="steps">Analysis steps for funnel.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="timezone">The timezone to use when specifying a relative timeframe. Optional, may be blank.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryFunnel(System.Collections.Generic.IEnumerable{Keen.Query.FunnelStep},Keen.Query.IQueryTimeframe,System.String)">
+            <summary>
+            Funnels count relevant events in succession. See API documentation for details.
+            </summary>
+            <param name="steps">Analysis steps for funnel.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="timezone">The timezone to use when specifying a relative timeframe. Optional, may be blank.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryMultiAnalysisAsync(System.String,System.Collections.Generic.IEnumerable{Keen.Query.MultiAnalysisParam},Keen.Query.IQueryTimeframe,System.Collections.Generic.IEnumerable{Keen.Query.QueryFilter},System.String)">
+            <summary>
+            Run multiple types of analysis over the same data.
+            </summary>
+            <param name="collection">Name of event collection to query.</param>
+            <param name="analysisParams">Defines the multiple types of analyses to perform.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="filters">Filter to narrow down the events used in analysis. Optional, may be null.</param>
+            <param name="timezone">The timezone to use when specifying a relative timeframe. Optional, may be blank.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryMultiAnalysis(System.String,System.Collections.Generic.IEnumerable{Keen.Query.MultiAnalysisParam},Keen.Query.IQueryTimeframe,System.Collections.Generic.IEnumerable{Keen.Query.QueryFilter},System.String)">
+            <summary>
+            Run multiple types of analysis over the same data.
+            </summary>
+            <param name="collection">Name of event collection to query.</param>
+            <param name="analysisParams">Defines the multiple types of analyses to perform.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="filters">Filter to narrow down the events used in analysis. Optional, may be null.</param>
+            <param name="timezone">The timezone to use when specifying a relative timeframe. Optional, may be blank.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryMultiAnalysisGroupAsync(System.String,System.Collections.Generic.IEnumerable{Keen.Query.MultiAnalysisParam},Keen.Query.IQueryTimeframe,System.Collections.Generic.IEnumerable{Keen.Query.QueryFilter},System.String,System.String)">
+            <summary>
+            Run multiple types of analysis over the same data,
+            grouped by the specified field.
+            </summary>
+            <param name="collection">Name of event collection to query.</param>
+            <param name="analysisParams">Defines the multiple types of analyses to perform.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="filters">Filter to narrow down the events used in analysis. Optional, may be null.</param>
+            <param name="groupBy">Name of a collection field by which to group results.</param>
+            <param name="timezone">The timezone to use when specifying a relative timeframe. Optional, may be blank.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryMultiAnalysisGroup(System.String,System.Collections.Generic.IEnumerable{Keen.Query.MultiAnalysisParam},Keen.Query.IQueryTimeframe,System.Collections.Generic.IEnumerable{Keen.Query.QueryFilter},System.String,System.String)">
+            <summary>
+            Run multiple types of analysis over the same data,
+            grouped by the specified field.
+            </summary>
+            <param name="collection">Name of event collection to query.</param>
+            <param name="analysisParams">Defines the multiple types of analyses to perform.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="filters">Filter to narrow down the events used in analysis. Optional, may be null.</param>
+            <param name="groupBy">Name of a collection field by which to group results.</param>
+            <param name="timezone">The timezone to use when specifying a relative timeframe. Optional, may be blank.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryMultiAnalysisIntervalAsync(System.String,System.Collections.Generic.IEnumerable{Keen.Query.MultiAnalysisParam},Keen.Query.IQueryTimeframe,Keen.Query.QueryInterval,System.Collections.Generic.IEnumerable{Keen.Query.QueryFilter},System.String)">
+            <summary>
+            Run multiple types of analysis over the same data.
+            Each item represents one interval.
+            </summary>
+            <param name="collection">Name of event collection to query.</param>
+            <param name="analysisParams">Defines the multiple types of analyses to perform.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="interval">The block size for partitioning the specified timeframe. Optional, may be null.</param>
+            <param name="filters">Filters to narrow down the events used in analysis. Optional, may be null.</param>
+            <param name="timezone">The timezone to use when specifying a relative timeframe. Optional, may be blank.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryMultiAnalysisInterval(System.String,System.Collections.Generic.IEnumerable{Keen.Query.MultiAnalysisParam},Keen.Query.IQueryTimeframe,Keen.Query.QueryInterval,System.Collections.Generic.IEnumerable{Keen.Query.QueryFilter},System.String)">
+            <summary>
+            Run multiple types of analysis over the same data.
+            Each item represents one interval.
+            </summary>
+            <param name="collection">Name of event collection to query.</param>
+            <param name="analysisParams">Defines the multiple types of analyses to perform.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="interval">The block size for partitioning the specified timeframe. Optional, may be null.</param>
+            <param name="filters">Filters to narrow down the events used in analysis. Optional, may be null.</param>
+            <param name="timezone">The timezone to use when specifying a relative timeframe. Optional, may be blank.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryMultiAnalysisIntervalGroupAsync(System.String,System.Collections.Generic.IEnumerable{Keen.Query.MultiAnalysisParam},Keen.Query.IQueryTimeframe,Keen.Query.QueryInterval,System.Collections.Generic.IEnumerable{Keen.Query.QueryFilter},System.String,System.String)">
+            <summary>
+            Run multiple types of analysis over the same data.
+            Each item contains information about the groupings in that interval.
+            </summary>
+            <param name="collection">Name of event collection to query.</param>
+            <param name="analysisParams">Defines the multiple types of analyses to perform.</param>
+            <param name="groupBy">Name of field by which to group results.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="interval">The block size for partitioning the specified timeframe. Optional, may be null.</param>
+            <param name="filters">Filters to narrow down the events used in analysis. Optional, may be null.</param>
+            <param name="timezone">The timezone to use when specifying a relative timeframe. Optional, may be blank.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryMultiAnalysisIntervalGroup(System.String,System.Collections.Generic.IEnumerable{Keen.Query.MultiAnalysisParam},Keen.Query.IQueryTimeframe,Keen.Query.QueryInterval,System.Collections.Generic.IEnumerable{Keen.Query.QueryFilter},System.String,System.String)">
+            <summary>
+            Run multiple types of analysis over the same data.
+            Each item contains information about the groupings in that interval.
+            </summary>
+            <param name="collection">Name of event collection to query.</param>
+            <param name="analysisParams">Defines the multiple types of analyses to perform.</param>
+            <param name="groupBy">Name of field by which to group results.</param>
+            <param name="timeframe">Specifies window of time from which to select events for analysis. May be absolute or relative.</param>
+            <param name="interval">The block size for partitioning the specified timeframe. Optional, may be null.</param>
+            <param name="filters">Filters to narrow down the events used in analysis. Optional, may be null.</param>
+            <param name="timezone">The timezone to use when specifying a relative timeframe. Optional, may be blank.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryDatasetAsync(System.String,System.String,System.String)">
+            <summary>
+            Get query results from a Cached Dataset.
+            </summary>
+            <param name="datasetName">Name of cached dataset to query.</param>
+            <param name="indexBy">The string property value you want to retrieve results by.</param>
+            <param name="timeframe">Limits retrieval of results to a specific portion of the Cached Dataset</param>
+            <returns>An instance of Newtonsoft.Json.Linq.JObject containing query results and metadata defining the cached dataset.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.QueryDataset(System.String,System.String,System.String)">
+            <summary>
+            Get query results from a Cached Dataset.
+            </summary>
+            <param name="datasetName">Name of cached dataset to query.</param>
+            <param name="indexBy">The string property value you want to retrieve results by.</param>
+            <param name="timeframe">Limits retrieval of results to a specific portion of the Cached Dataset</param>
+            <returns>An instance of Newtonsoft.Json.Linq.JObject containing query results and metadata defining the cached dataset.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.GetDatasetDefinitionAsync(System.String)">
+            <summary>
+            Get the definition of your cached dataset.
+            </summary>
+            <param name="datasetName">Name of cached dataset to get the definition of.</param>
+            <returns>An instance of Keen.Core.Dataset.DatasetDefinition containing metadata about your cached dataset.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.GetDatasetDefinition(System.String)">
+            <summary>
+            Get the definition of your cached dataset.
+            </summary>
+            <param name="datasetName">Name of cached dataset to get the definition of.</param>
+            <returns>An instance of Keen.Core.Dataset.DatasetDefinition containing metadata about your cached dataset.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.ListDatasetDefinitionsAsync(System.Int32,System.String)">
+            <summary>
+            Lists the first n cached dataset definitions in your project.
+            </summary>
+            <param name="limit">How many cached dataset definitions to return at a time (1-100). Defaults to 10.</param>
+            <param name="afterName">A cursor for use in pagination. afterName is the Cached Dataset name that defines your place in the list. 
+            For instance, if you make a list request and receive 100 Cached Dataset definitions, 
+            ending with dataset_foo you can use dataset_foo as your afterName to retrieve the next page of definitions. 
+            Lists also return with helper “NextPageUrl” that uses AfterName, 
+            so your subsequent call can fetch the next page of the list easily.</param>
+            <returns>An instance of Keen.Core.Dataset.DatasetDefinitionCollection containing the total count, next page url and list of DatasetDefinitions.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.ListDatasetDefinitions(System.Int32,System.String)">
+            <summary>
+            Lists the first n cached dataset definitions in your project.
+            </summary>
+            <param name="limit">How many cached dataset definitions to return at a time (1-100). Defaults to 10.</param>
+            <param name="afterName">A cursor for use in pagination. afterName is the Cached Dataset name that defines your place in the list. 
+            For instance, if you make a list request and receive 100 Cached Dataset definitions, 
+            ending with dataset_foo you can use dataset_foo as your afterName to retrieve the next page of definitions. 
+            Lists also return with helper “NextPageUrl” that uses AfterName, 
+            so your subsequent call can fetch the next page of the list easily.</param>
+            <returns>An instance of Keen.Core.Dataset.DatasetDefinitionCollection containing the total count, next page url and list of DatasetDefinitions.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.ListAllDatasetDefinitionsAsync">
+            <summary>
+            Lists all the dataset definitions in your project.
+            </summary>
+            <returns>A list of Keen.Core.Dataset.DatasetDefinition</returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.ListAllDatasetDefinitions">
+            <summary>
+            Lists all the dataset definitions in your project.
+            </summary>
+            <returns>A list of Keen.Core.Dataset.DatasetDefinition</returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.CreateDatasetAsync(Keen.Dataset.DatasetDefinition)">
+            <summary>
+            Creates a new Cached Dataset
+            </summary>
+            <param name="dataset">An instance of Keen.Core.Dataset.DatasetDefinition. It must have DatasetName, DisplayName, IndexBy and Query populated.</param>
+            <returns>An instance of Keen.Core.Dataset.DatasetDefinition populated more information.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.CreateDataset(Keen.Dataset.DatasetDefinition)">
+            <summary>
+            Creates a new Cached Dataset
+            </summary>
+            <param name="dataset">An instance of Keen.Core.Dataset.DatasetDefinition. It must have DatasetName, DisplayName, IndexBy and Query populated.</param>
+            <returns>An instance of Keen.Core.Dataset.DatasetDefinition populated more information.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenClient.DeleteDatasetAsync(System.String)">
+            <summary>
+            Delete a Cached Dataset 
+            </summary>
+            <param name="datasetName">The name of the dataset to be deleted.</param>
+        </member>
+        <member name="M:Keen.Core.KeenClient.DeleteDataset(System.String)">
+            <summary>
+            Delete a Cached Dataset 
+            </summary>
+            <param name="datasetName">The name of the dataset to be deleted.</param>
+        </member>
+        <member name="T:Keen.Core.KeenHttpClient">
+            <summary>
+            Helps with performing HTTP operations destined for a Keen API endpoint. Helper methods in
+            this class will add appropriate headers and config to use the underlying HttpClient
+            in the way expected by the Keen IO API. This class should be long-lived and all public
+            methods are thread-safe, so ideal usage is to configure it once for a given base URL and
+            reuse it with relative resources to send requests for the duration of the app or module.
+            </summary>
+        </member>
+        <member name="M:Keen.Core.KeenHttpClient.GetAsync(System.String,System.String)">
+            <summary>
+            Create and send a GET request to the given relative resource using the given key for
+            authentication.
+            </summary>
+            <param name="resource">The relative resource to GET. Must be properly formatted as a
+                relative Uri.</param>
+            <param name="authKey">The key to use for authenticating this request.</param>
+            <returns>The response message.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenHttpClient.GetAsync(System.Uri,System.String)">
+            <summary>
+            Create and send a GET request to the given relative resource using the given key for
+            authentication.
+            </summary>
+            <param name="resource">The relative resource to GET.</param>
+            <param name="authKey">The key to use for authenticating this request.</param>
+            <returns>The response message.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenHttpClient.PostAsync(System.String,System.String,System.String)">
+            <summary>
+            Create and send a POST request with the given content to the given relative resource
+            using the given key for authentication. 
+            </summary>
+            <param name="resource">The relative resource to POST. Must be properly formatted as a
+                relative Uri.</param>
+            <param name="authKey">The key to use for authenticating this request.</param>
+            <param name="content">The POST body to send.</param>
+            <returns>The response message.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenHttpClient.PostAsync(System.Uri,System.String,System.String)">
+            <summary>
+            Create and send a POST request with the given content to the given relative resource
+            using the given key for authentication. 
+            </summary>
+            <param name="resource">The relative resource to POST.</param>
+            <param name="authKey">The key to use for authenticating this request.</param>
+            <param name="content">The POST body to send.</param>
+            <returns>The response message.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenHttpClient.DeleteAsync(System.String,System.String)">
+            <summary>
+            Create and send a DELETE request to the given relative resource using the given key for
+            authentication.
+            </summary>
+            <param name="resource">The relative resource to DELETE. Must be properly formatted as a
+                relative Uri.</param>
+            <param name="authKey">The key to use for authenticating this request.</param>
+            <returns>The response message.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenHttpClient.DeleteAsync(System.Uri,System.String)">
+            <summary>
+            Create and send a DELETE request to the given relative resource using the given key for
+            authentication.
+            </summary>
+            <param name="resource">The relative resource to DELETE.</param>
+            <param name="authKey">The key to use for authenticating this request.</param>
+            <returns>The response message.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenHttpClient.PutAsync(System.String,System.String,System.String)">
+            <summary>
+            Create and send a PUT request with the given content to the given relative resource
+            using the given key for authentication. 
+            </summary>
+            <param name="resource">The relative resource to PUT. Must be properly formatted as a
+                relative Uri.</param>
+            <param name="authKey">The key to use for authenticating this request.</param>
+            <param name="content">The PUT body to send.</param>
+            <returns>The response message.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenHttpClient.PutAsync(System.Uri,System.String,System.String)">
+            <summary>
+            Create and send a PUT request with the given content to the given relative resource
+            using the given key for authentication. 
+            </summary>
+            <param name="resource">The relative resource to PUT. Must be properly formatted as a
+                relative Uri.</param>
+            <param name="authKey">The key to use for authenticating this request.</param>
+            <param name="content">The PUT body to send.</param>
+            <returns>The response message.</returns>
+        </member>
+        <member name="T:Keen.Core.KeenHttpClientFactory">
+            <summary>
+            A set of factory methods to help in creating see cref="IKeenHttpClient"/> instances. These
+            are useful when implementing see cref="IKeenHttpClientProvider"/> so that the constructed
+            instances have the right mix of default and custom configuration.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Keen.Core.KeenHttpClientFactory.CreateDefaultHandlerChain" -->
+        <!-- Badly formed XML comment ignored for member "M:Keen.Core.KeenHttpClientFactory.CreateHandlerChain(System.Net.Http.DelegatingHandler[])" -->
+        <member name="M:Keen.Core.KeenHttpClientFactory.CreateHandlerChain(System.Net.Http.HttpClientHandler,System.Net.Http.DelegatingHandler[])">
+            <summary>
+            Create an HttpMessageHandler representing the handler pipeline. We will construct the
+            HTTP handler pipeline such that provided handlers are called in order for requests, and
+            receive responses in reverse order. Keen internal handlers will defer to the first
+            DelegatingHandler and the pipeline will terminate at our HttpClientHandler or to the
+            given HttpClientHandler if present, in case client code wants to do something like use
+            WebRequestHandler functionality or otherwise add custom behavior.
+            </summary>
+            <param name="innerHandler">Terminating HttpClientHandler.</param>
+            <param name="handlers">Handlers to be chained in the pipeline.</param>
+            <returns>The entire handler chain.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenHttpClientFactory.Create(System.Uri,Keen.Core.IHttpClientProvider)">
+            <summary>
+            Construct an IKeenHttpClient for the given base URL, configured with an HttpClient that
+            is retrieved and/or stored in the given IHttpClientProvider. If necessary, the
+            HttpClient is created and configured with the default set of HTTP handlers.
+            
+            <seealso cref="M:Keen.Core.KeenHttpClientFactory.CreateDefaultHandlerChain"/>
+            
+            </summary>
+            <param name="baseUrl">The base URL for the constructed IKeenHttpClient.</param>
+            <param name="httpClientProvider">The provider used to retrieve the HttpClient.</param>
+            <returns>A new IKeenHttpClient for the given base URL.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenHttpClientFactory.Create(System.Uri,Keen.Core.IHttpClientProvider,System.Net.Http.HttpClientHandler,System.Net.Http.DelegatingHandler[])">
+            <summary>
+            Construct an IKeenHttpClient for the given base URL, configured with an HttpClient that
+            is retrieved and/or stored in the given IHttpClientProvider, and if necessary,
+            configured with the given HTTP handlers.
+            
+            <seealso cref="M:Keen.Core.KeenHttpClientFactory.CreateHandlerChain(System.Net.Http.DelegatingHandler[])"/>
+            
+            </summary>
+            <param name="baseUrl">The base URL for the constructed IKeenHttpClient.</param>
+            <param name="httpClientProvider">The provider used to retrieve the HttpClient.</param>
+            <param name="innerHandler">HTTP handler terminating the handler chain.</param>
+            <param name="handlers">Handlers to be chained in the pipeline.</param>
+            <returns>A new IKeenHttpClient for the given base URL.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenHttpClientFactory.Create(System.Uri,Keen.Core.IHttpClientProvider,System.Func{System.Tuple{System.Net.Http.HttpClientHandler,System.Collections.Generic.IEnumerable{System.Net.Http.DelegatingHandler}}})">
+            <summary>
+            Construct an IKeenHttpClient for the given base URL, configured with an HttpClient that
+            is retrieved and/or stored in the given IHttpClientProvider, and if necessary,
+            configured with the given HTTP handlers in a lazy fashion only if construction is
+            necessary. Note that the given handler factory function could be called under a lock,
+            so care should be taken in multi-threaded scenarios.
+            
+            <seealso cref="M:Keen.Core.KeenHttpClientFactory.CreateHandlerChain(System.Net.Http.DelegatingHandler[])"/>
+            
+            </summary>
+            <param name="baseUrl">The base URL for the constructed IKeenHttpClient.</param>
+            <param name="httpClientProvider">The provider used to retrieve the HttpClient.</param>
+            <param name="getHandlers">A factory function called if construction of the HttpClient
+                is necessary. It should return an optional HttpClientHandler to terminate the
+                handler chain, as well as an optional list of intermediate HTTP handlers to be
+                chained in the pipeline.</param>
+            <returns>A new IKeenHttpClient for the given base URL.</returns>
+        </member>
+        <member name="T:Keen.Core.KeenHttpClientProvider">
+            <summary>
+            An implementation of <see cref="T:Keen.Core.IKeenHttpClientProvider"/> that uses the default
+            <see cref="T:Keen.Core.KeenHttpClient"/> creation logic and relies on the <see cref="T:Keen.Core.HttpClientCache"/>
+            class as an <see cref="T:Keen.Core.IHttpClientProvider"/>.
+            </summary>
+        </member>
+        <member name="M:Keen.Core.KeenHttpClientProvider.GetForUrl(System.Uri)">
+            <summary>
+            Given a base URL, return an IKeenHttpClient against which requests can be made.
+            </summary>
+            <param name="baseUrl">The base URL, e.g. https://api.keen.io/3.0/ </param>
+            <returns>An IKeenHttpClient configured to handle requests to resources relative to the
+                given base URL.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenUtil.GetSdkVersion">
+            <summary>
+            Retrieve a string representing the current version of the Keen IO SDK, as defined by
+            the AssemblyInformationalVersion.
+            </summary>
+            <returns>The SDK version string.</returns>
+        </member>
+        <member name="M:Keen.Core.KeenUtil.ValidatePropertyName(System.String)">
+            <summary>
+            Apply property name restrictions. Throws KeenException with an 
+            explanation if a collection name is unacceptable.
+            </summary>
+            <param name="property"></param>
+        </member>
+        <member name="M:Keen.Core.KeenUtil.ValidateEventCollectionName(System.String)">
+            <summary>
+            Apply the collection name restrictions. Throws KeenException with an 
+            explanation if a collection name is unacceptable.
+            </summary>
+            <param name="collection"></param>
+        </member>
+        <member name="M:Keen.Core.KeenUtil.GetBulkApiError(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Check the 'error' field on a bulk insert operation response and return 
+            the appropriate exception.
+            </summary>
+            <param name="apiResponse">Deserialized json response from a Keen API call.</param>
+        </member>
+        <member name="M:Keen.Core.KeenUtil.CheckApiErrorCode(System.Object)">
+            <summary>
+            Check the 'error_code' field and throw the appropriate exception if non-null.
+            </summary>
+            <param name="apiResponse">Deserialized json response from a Keen API call.</param>
+        </member>
+        <member name="M:Keen.Core.KeenUtil.TryUnwrap(System.AggregateException)">
+            <summary>
+            Flatten an AggregateException and if only one exception instance is found 
+            in the innerexceptions, return it, otherwise return the original 
+            AggregateException unchanged.
+            </summary>
+            <param name="ex"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Keen.Core.ProjectSettingsProvider.KeenUrl">
+            <summary>
+            The Keen.IO URL for this project. Usually this will be the
+            server address and API version.
+            </summary>
+        </member>
+        <member name="P:Keen.Core.ProjectSettingsProvider.ProjectId">
+            <summary>
+            The Project ID, identifying the data silo to be accessed.
+            </summary>
+        </member>
+        <member name="P:Keen.Core.ProjectSettingsProvider.MasterKey">
+            <summary>
+            The Master API key, required for getting a collection schema
+            or deleting the entire event collection.
+            </summary>
+        </member>
+        <member name="P:Keen.Core.ProjectSettingsProvider.WriteKey">
+            <summary>
+            The Write API key, required for inserting events.
+            </summary>
+        </member>
+        <member name="P:Keen.Core.ProjectSettingsProvider.ReadKey">
+            <summary>
+            The Read API key, used with query requests.
+            </summary>
+        </member>
+        <member name="M:Keen.Core.ProjectSettingsProvider.#ctor(System.String,System.String,System.String,System.String,System.String)">
+             <summary>
+             Obtains project setting values as constructor parameters
+             </summary>
+            
+             <param name="projectId">Keen project id, required</param>
+             <param name="masterKey">Master API key, required for certain operations, such as
+                 getting schema or deleting collections</param>
+             <param name="writeKey">Write API key, required for inserting events</param>
+             <param name="readKey">Read API key, required for performing queries</param>
+             <param name="keenUrl">Base Keen.IO service URL</param>
+        </member>
+        <member name="M:Keen.Core.ProjectSettingsProvider.#ctor">
+            <summary>
+            Protected constructor to allow base classes to share initialization code more conveniently than by having to pass parameters through a constructor
+            </summary>
+        </member>
+        <member name="T:Keen.Core.ProjectSettingsProviderEnv">
+            <summary>
+            Project settings provider which reads project settings from environment variables.
+            </summary>
+        </member>
+        <member name="M:Keen.Core.ProjectSettingsProviderEnv.#ctor">
+            <summary>
+            <para>Reads the project settings from environment variables</para>
+            <para>Project ID should be in variable KEEN_PROJECT_ID</para>
+            <para>Master Key should be in variable KEEN_MASTER_KEY</para>
+            <para>Write Key should be in variable KEEN_WRITE_KEY</para>
+            <para>ReadKey should be in variable KEEN_READ_KEY</para>
+            <para>Keen.IO API url should be in variable KEEN_SERVER_URL</para>
+            </summary>
+        </member>
+        <member name="T:Keen.Core.ProjectSettingsProviderFile">
+            <summary>
+            Project settings provider which reads project settings from a text file.
+            </summary>
+        </member>
+        <member name="M:Keen.Core.ProjectSettingsProviderFile.#ctor(System.String)">
+            <summary>
+            <para>Reads project settings from a json formatted file with a root object containing the below keys.</para>
+            <para>KEEN_PROJECT_ID is required, along with at least one access key.</para>
+            <para>KEEN_PROJECT_ID key should contain the Project Id. Required.</para>
+            <para>KEEN_MASTER_KEY key should contain the Master Key. Optional, and highly discouraged unless using APIs that require a master key.</para>
+            <para>KEEN_WRITE_KEY key should contain the Write Key. Optional, though at least one access key is required.</para>
+            <para>KEEN_READ_KEY key should contain the ReadKey. Optional, though at least one access key is required.</para>
+            <para>KEEN_SERVER_URL key should contain the Keen.IO API url. Optional.</para>
+            </summary>
+            <param name="filePath">The path to the file</param>
+        </member>
+        <member name="T:Keen.Core.ScopedKey">
+            <summary>
+            ScopedKey provides encryption and decryption functions which can be used to create 
+            and read scoped keys, such as the API Read and Write keys. 
+            </summary>
+        </member>
+        <member name="M:Keen.Core.ScopedKey.Encrypt(System.String,System.Object,System.String)">
+            <summary>
+            Encrypt an object containing security options to create a scoped key.
+            </summary>
+            <param name="apiKey">Master API key</param>
+            <param name="secOptions">An object that can be serialized to produce JSON formatted Security Options</param>
+            <param name="IV">Optional IV, normally not required</param>
+            <returns>Hex-encoded scoped key</returns>
+        </member>
+        <member name="M:Keen.Core.ScopedKey.EncryptString(System.String,System.String,System.String)">
+            <summary>
+            Encrypt a string containing JSON formatted Security Options to create a scoped key.
+            </summary>
+            <param name="apiKey">Master API key</param>
+            <param name="secOptions">Security Options in JSON format</param>
+            <param name="IV">Optional IV, normally not required</param>
+            <returns>Hex-encoded scoped key</returns>
+        </member>
+        <member name="M:Keen.Core.ScopedKey.Decrypt(System.String,System.String)">
+            <summary>
+            Decrypt an existing scoped key.
+            </summary>
+            <param name="apiKey">Master API key</param>
+            <param name="scopedKey">Scoped key to be decrypted</param>
+            <returns>JSON formatted Security Options</returns>
+        </member>
+        <member name="M:Keen.Core.ScopedKey.ConvertKey(System.String)">
+            <summary>
+            Convert an apiKey string to a byte array.
+            </summary>
+            <param name="apiKey">The key used to encrypt.</param>
+            <returns>A byte array of the correct size and format for the key length.</returns>
+        </member>
+        <member name="M:Keen.Core.ScopedKey.GetAes(System.Byte[],System.String)">
+            <summary>
+            Set up an Aes instance with the correct mode, key and IV
+            </summary>
+            <param name="Key">Encryption key</param>
+            <param name="IV">Initialization Vector, if left blank one will be generated.</param>
+            <returns>An AES instance appropriate for encrypting with this key and IV.</returns>
+        </member>
+        <member name="T:Keen.EventCache.CachedEvent">
+            <summary>
+            CachedEvent is a container for user event data which associates the
+            target event collection name and, if an error occurs during submission,
+            the exception instance.
+            </summary>
+        </member>
+        <member name="T:Keen.DataEnrichment.AddOn">
+            <summary>
+            Represents a Data Enrichment add-on.
+            <remarks>
+            https://keen.io/docs/data-collection/data-enrichment/
+            </remarks>
+            </summary>
+        </member>
+        <member name="P:Keen.DataEnrichment.AddOn.Name">
+            <summary>
+            Name of the add-on 
+            </summary>
+        </member>
+        <member name="P:Keen.DataEnrichment.AddOn.Input">
+            <summary>
+            Parameters required by the add-on
+            </summary>
+        </member>
+        <member name="P:Keen.DataEnrichment.AddOn.Output">
+            <summary>
+            Target property name where the enriched data should be stored.
+            </summary>
+        </member>
+        <member name="M:Keen.DataEnrichment.AddOn.#ctor(System.String,System.Collections.Generic.IDictionary{System.String,System.String},System.String)">
+            <param name="name">Name of the data enhancement add-on.</param>
+            <param name="input">Name-value pairs of input parameters required by the add-on.</param>
+            <param name="output">Target property name for the enriched data.</param>
+        </member>
+        <member name="M:Keen.DataEnrichment.AddOn.IpToGeo(System.String,System.String)">
+            <summary>
+            Build and return an IpToGeo Data Enhancement add-on. This add-on reads
+            an IP address from the field identified by the input parameter and writes
+            data about the geographical location to the field identified by the output parameter.
+            </summary>
+            <param name="outputField">Name of field to store the geographical information</param>
+            <param name="ipField">Name of field containing an IP address</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.DataEnrichment.AddOn.UserAgentParser(System.String,System.String)">
+            <summary>
+            Build and return a User-Agent Data Enhancement add-on. This add-on reads
+            a user agent string from the field identified by the input parameter and parses it 
+            into the device, browser, browser version, OS, and OS version fields and stores that
+            data in the field identified by the output parameter.
+            </summary>
+            <param name="outputField">Name of field to store the parsed user agent field</param>
+            <param name="userAgentString">Name of field containing the user agent string</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.DataEnrichment.AddOn.UrlParser(System.String,System.String)">
+            <summary>
+            Build and return a URL Parser Data Enhancement add-on. This add-on reads
+            a well-formed URL from the field identified by the input parameter and parses
+            it into it's components for easier filtering. The components are stored in the
+            field identified by the output parameter.
+            </summary>
+            <param name="urlField">Name of field containing the URL to parse</param>
+            <param name="outputField">Name of field to store the parsed url components</param>
+            <returns></returns>
+        </member>
+        <member name="M:Keen.DataEnrichment.AddOn.ReferrerParser(System.String,System.String,System.String)">
+            <summary>
+            Build and return a Referrer Parser Data Enhancement add-on. This add-on reads
+            a well-formed referrer URL from the field identified by the input parameter and 
+            parses it into it's components. The components are stored in the field identified
+            by the output parameter.
+            </summary>
+            <param name="pageUrlField">Name of field containing the URL of the current page</param>
+            <param name="outputField">Name of field to store the parsed referrer data.</param>
+            <param name="referrerUrlField">Name of field containing the referrer URL</param>
+            <returns></returns>
+        </member>
+        <member name="P:Keen.Dataset.DatasetDefinition.DatasetName">
+            <summary>
+            Name of the dataset, which is used as an identifier. Must be unique per project.
+            </summary>
+        </member>
+        <member name="P:Keen.Dataset.DatasetDefinition.DisplayName">
+            <summary>
+            The human-readable string name for your Cached Dataset.
+            </summary>
+        </member>
+        <member name="P:Keen.Dataset.DatasetDefinition.Query">
+            <summary>
+            Holds information describing the query which is cached by this Cached Dataset.
+            </summary>
+        </member>
+        <member name="P:Keen.Dataset.DatasetDefinition.LastScheduledDate">
+            <summary>
+            When the most recent computation was queued.
+            </summary>
+        </member>
+        <member name="P:Keen.Dataset.DatasetDefinition.LatestSubtimeframeAvailable">
+            <summary>
+            The most recent interval that has been computed for the Cached Dataset.
+            </summary>
+        </member>
+        <member name="P:Keen.Dataset.DatasetDefinition.MillisecondsBehind">
+            <summary>
+            The difference between now and the most recent datapoint computed.
+            </summary>
+        </member>
+        <member name="P:Keen.Dataset.DatasetDefinition.IndexBy">
+            <summary>
+            The event property name of string values results are retrieved by.
+            </summary>
+        </member>
+        <member name="T:Keen.Dataset.DatasetDefinitionCollection">
+            <summary>
+            A model for a collection of DatasetDefinitions with paging information.
+            </summary>
+        </member>
+        <member name="P:Keen.Dataset.DatasetDefinitionCollection.Datasets">
+            <summary>
+            A list of the DatasetDefinitions returned in this page.
+            </summary>
+        </member>
+        <member name="P:Keen.Dataset.DatasetDefinitionCollection.NextPageUrl">
+            <summary>
+            The url of the next page of Dataset definitions.
+            </summary>
+        </member>
+        <member name="P:Keen.Dataset.DatasetDefinitionCollection.Count">
+            <summary>
+            The total count of Cached Datasets for this project.
+            </summary>
+        </member>
+        <member name="T:Keen.Dataset.Datasets">
+            <summary>
+            Datasets implements the IDataset interface which represents the Keen.IO Cached Datasets
+            API methods.
+            </summary>
+        </member>
+        <member name="M:Keen.Dataset.IDataset.GetResultsAsync(System.String,System.String,System.String)">
+            <summary>
+            Get query results from a Cached Dataset.
+            </summary>
+            <param name="datasetName">Name of cached dataset to query.</param>
+            <param name="indexBy">The string property value by which to retrieve results.</param>
+            <param name="timeframe">Limits retrieval of results to a specific portion of the
+              Cached Dataset</param>
+            <returns>A JObject containing query results and metadata defining the cached
+              dataset.</returns>
+        </member>
+        <member name="M:Keen.Dataset.IDataset.GetDefinitionAsync(System.String)">
+            <summary>
+            Get the definition of your cached dataset.
+            </summary>
+            <param name="datasetName">Name of cached dataset for which to retrieve the
+              definition.</param>
+            <returns>An DatasetDefinition containing metadata about a cached dataset.</returns>
+        </member>
+        <member name="M:Keen.Dataset.IDataset.ListDefinitionsAsync(System.Int32,System.String)">
+            <summary>
+            Lists the first n cached dataset definitions in your project.
+            </summary>
+            <param name="limit">How many cached dataset definitions to return at a time (1-100).
+              Defaults to 10.</param>
+            <param name="afterName">A cursor for use in pagination. afterName is the Cached Dataset
+              name that defines your place in the list.</param>
+        </member>
+        <member name="M:Keen.Dataset.IDataset.ListAllDefinitionsAsync">
+            <summary>
+            Lists all the dataset definitions in the project.
+            </summary>
+            <returns>An enumerable of DatasetDefinitions.</returns>
+        </member>
+        <member name="M:Keen.Dataset.IDataset.DeleteDatasetAsync(System.String)">
+            <summary>
+            Delete a Cached Dataset 
+            </summary>
+            <param name="datasetName">The name of the dataset to be deleted.</param>
+        </member>
+        <member name="M:Keen.Dataset.IDataset.CreateDatasetAsync(Keen.Dataset.DatasetDefinition)">
+            <summary>
+            Creates a new Cached Dataset
+            </summary>
+            <param name="dataset">An instance of DatasetDefinition. At minimum, it must have
+              DatasetName, DisplayName, IndexBy and Query populated.</param>
+            <returns>An instance of DatasetDefinition populated with more information about the
+              create Dataset.</returns>
+        </member>
+        <member name="T:Keen.Query.FunnelStep">
+            <summary>
+            Represents one step in a funnel query. See the Keen.IO API for details on how to perform a funnel query.
+            </summary>
+        </member>
+        <member name="P:Keen.Query.FunnelStep.EventCollection">
+            <summary>
+             The name of the event that defines the step.
+            </summary>
+        </member>
+        <member name="P:Keen.Query.FunnelStep.ActorProperty">
+            <summary>
+            The name of the property that can be used as a unique identifier for a user (or any type of actor).
+            </summary>
+        </member>
+        <member name="P:Keen.Query.FunnelStep.Filters">
+            <summary>
+            Filters are used to narrow the scope of events used in this step of the funnel.
+            </summary>
+        </member>
+        <member name="P:Keen.Query.FunnelStep.Inverted">
+            <summary>
+            If set to true, events matching this step will be excluded from the funnel.
+            May not be applied to an initial step.
+            </summary>
+        </member>
+        <member name="P:Keen.Query.FunnelStep.Optional">
+            <summary>
+            If set to true, filtering applied to this step won't apply to any steps after it.
+            May not be applied to an initial step.
+            </summary>
+        </member>
+        <member name="P:Keen.Query.FunnelStep.Timeframe">
+            <summary>
+            Window of time to use for the analysis. If not set, the timeframe from the funnel will be inherited, if available.
+            </summary>
+        </member>
+        <member name="P:Keen.Query.FunnelStep.TimeZone">
+            <summary>
+            Offset from UTC in seconds. If not set, the timezone from the funnel will be inherited, if available.
+            </summary>
+        </member>
+        <member name="P:Keen.Query.FunnelStep.WithActors">
+            <summary>
+            If set to true, a list of unique actor_properties will be returned for each step as the 'actors' 
+            attribute alongside the 'results' attribute.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.IQueries.AvailableQueries">
+            <summary>
+            Returns a list of available queries and links to them.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.MultiAnalysisParam.#ctor(System.String,Keen.Query.MultiAnalysisParam.Metric)">
+            <summary>
+            MultiAnalysisParam defines one kind of analysis to run in a MultiAnalysis request.
+            </summary>
+            <param name="label">A user defined string that acts as a name for the analysis. 
+            This will be returned in the results so the various analyses are easily identifiable.</param>
+            <param name="analysis">The metric type.</param>
+        </member>
+        <member name="T:Keen.Query.Queries">
+            <summary>
+            Queries implements the IQueries interface which represents the Keen.IO Query API methods.
+            </summary>
+        </member>
+        <member name="T:Keen.Query.QueryAbsoluteTimeframe">
+            <summary>
+            A pair of dates representing a time interval.
+            </summary>
+        </member>
+        <member name="T:Keen.Query.QueryDefinition">
+            <summary>
+            Holds information describing the query that is cached within a cached dataset.
+            </summary>
+        </member>
+        <member name="P:Keen.Query.QueryDefinition.ProjectId">
+            <summary>
+            Unique id of the project to analyze.
+            </summary>
+        </member>
+        <member name="P:Keen.Query.QueryDefinition.AnalysisType">
+            <summary>
+            The type of analysis for this query (e.g. count, count_unique, sum etc.)
+            </summary>
+        </member>
+        <member name="P:Keen.Query.QueryDefinition.EventCollection">
+            <summary>
+            Specifies the name of the event collection to analyze.
+            </summary>
+        </member>
+        <member name="P:Keen.Query.QueryDefinition.Filters">
+            <summary>
+            Refines the scope of events to be included in the analysis based on event property
+            values.
+            </summary>
+        </member>
+        <member name="P:Keen.Query.QueryDefinition.Timeframe">
+            <summary>
+            Limits analysis to a specific period of time when the events occurred.
+            </summary>
+        </member>
+        <member name="P:Keen.Query.QueryDefinition.Timezone">
+            <summary>
+            Assigns a timezone offset to relative timeframes.
+            </summary>
+        </member>
+        <member name="P:Keen.Query.QueryDefinition.Interval">
+            <summary>
+            Specifies the size of time interval by which to group results. Using this parameter
+            changes the response format.
+            </summary>
+        </member>
+        <member name="P:Keen.Query.QueryDefinition.GroupBy">
+            <summary>
+            Specifies the names of properties by which to group results. Using this parameter
+            changes the response format.
+            </summary>
+        </member>
+        <member name="T:Keen.Query.QueryFilter">
+            <summary>
+            Represents a filter that can be applied to a query.
+            Because not all filter operators make sense for the different property data types, only certain operators are valid for each data type.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryFilter.FilterOperator.Equals">
+            <summary>
+            Equal to.
+            <para>Use with string, number, boolean</para>
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryFilter.FilterOperator.NotEqual">
+            <summary>
+            Not equal to.
+            <para>Use with string, number</para>
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryFilter.FilterOperator.LessThan">
+            <summary>
+            Less than.
+            <para>Use with string, number</para>
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryFilter.FilterOperator.LessThanOrEqual">
+            <summary>
+            Less than or equal to.
+            <para>Use with number</para>
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryFilter.FilterOperator.GreaterThan">
+            <summary>
+            Greater than.
+            <para>Use with string, number</para>
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryFilter.FilterOperator.GreaterThanOrEqual">
+            <summary>
+            Greater than or equal to.
+            <para>Use with number</para>
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryFilter.FilterOperator.Exists">
+            <summary>
+            Whether a specific property exists on an event record.
+            The Value property must be set to "true" or "false"
+            <para>Use with string, number, boolean</para>
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryFilter.FilterOperator.In">
+            <summary>
+            Whether the property value is in a give set of values.
+            The Value property must be a JSON array of values, e.g.: "[1,2,4,5]"
+            <para>Use with string, number, boolean</para>
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryFilter.FilterOperator.Contains">
+            <summary>
+            Whether the property value contains the give set of characters.
+            <para>Use with strings</para>
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryFilter.FilterOperator.NotContains">
+            <summary>
+            Filter on events that do not contain the specified property value.
+            <para>Use with strings</para>
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryFilter.FilterOperator.Within">
+            <summary>
+            Used to select events within a certain radius of the provided geo coordinate.
+            <para>Use with geo analysis</para>
+            </summary>
+        </member>
+        <member name="P:Keen.Query.QueryFilter.PropertyName">
+            <summary>
+            The name of the property on which to filter
+            </summary>
+        </member>
+        <member name="P:Keen.Query.QueryFilter.Operator">
+            <summary>
+            The filter operator to use
+            </summary>
+        </member>
+        <member name="P:Keen.Query.QueryFilter.Value">
+            <summary>
+            The value to compare to the property specified in PropertyName
+            </summary>
+        </member>
+        <member name="T:Keen.Query.QueryGroupValue`1">
+            <summary>
+            Represents the values from a query performed with a groupby. 
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:Keen.Query.QueryGroupValue`1.Value">
+            <summary>
+            The value for the group. Varies with the type of query performed.
+            </summary>
+        </member>
+        <member name="P:Keen.Query.QueryGroupValue`1.Group">
+            <summary>
+            The value of the groupby field for this value.
+            </summary>
+        </member>
+        <member name="T:Keen.Query.QueryInterval">
+            <summary>
+            Provides values for interval query parameter
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryInterval.Minutely">
+            <summary>
+            breaks your timeframe into minute long chunks.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryInterval.Hourly">
+            <summary>
+            breaks your timeframe into hour long chunks.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryInterval.Daily">
+            <summary>
+            breaks your timeframe into day long chunks.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryInterval.Weekly">
+            <summary>
+            breaks your timeframe into week long chunks.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryInterval.Monthly">
+            <summary>
+            breaks your timeframe into month long chunks.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryInterval.Yearly">
+            <summary>
+            breaks your timeframe into year long chunks.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryInterval.EveryNMinutes(System.Int32)">
+            <summary>
+            breaks your timeframe into chunks of the specified length
+            </summary>
+            <param name="n">chunk length</param>
+        </member>
+        <member name="M:Keen.Query.QueryInterval.EveryNHours(System.Int32)">
+            <summary>
+            breaks your timeframe into chunks of the specified length
+            </summary>
+            <param name="n">chunk length</param>
+        </member>
+        <member name="M:Keen.Query.QueryInterval.EveryNDays(System.Int32)">
+            <summary>
+            breaks your timeframe into chunks of the specified length
+            </summary>
+            <param name="n">chunk length</param>
+        </member>
+        <member name="M:Keen.Query.QueryInterval.EveryNWeeks(System.Int32)">
+            <summary>
+            breaks your timeframe into chunks of the specified length
+            </summary>
+            <param name="n">chunk length</param>
+        </member>
+        <member name="M:Keen.Query.QueryInterval.EveryNMonths(System.Int32)">
+            <summary>
+            breaks your timeframe into chunks of the specified length
+            </summary>
+            <param name="n">chunk length</param>
+        </member>
+        <member name="M:Keen.Query.QueryInterval.EveryNYears(System.Int32)">
+            <summary>
+            breaks your timeframe into chunks of the specified length
+            </summary>
+            <param name="n">chunk length</param>
+        </member>
+        <member name="T:Keen.Query.QueryIntervalValue`1">
+            <summary>
+            Represents a set of values from a query performed with an interval parameter.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:Keen.Query.QueryIntervalValue`1.Value">
+            <summary>
+            The value for this interval. Varies with the type of query performed.
+            </summary>
+        </member>
+        <member name="P:Keen.Query.QueryIntervalValue`1.Start">
+            <summary>
+            Start time for this interval.
+            </summary>
+        </member>
+        <member name="P:Keen.Query.QueryIntervalValue`1.End">
+            <summary>
+            End time for this interval.
+            </summary>
+        </member>
+        <member name="T:Keen.Query.QueryRelativeTimeframe">
+            <summary>
+            Provides values for relative timeframe query parameter.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.ThisMinute">
+            <summary>
+            Creates a timeframe starting from the beginning of the current minute until now.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.ThisHour">
+            <summary>
+            Creates a timeframe starting from the beginning of the current hour until now.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.ThisDay">
+            <summary>
+            Creates a timeframe starting from the beginning of the current day until now.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.ThisWeek">
+            <summary>
+            Creates a timeframe starting from the beginning of the current week until now.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.ThisMonth">
+            <summary>
+            Creates a timeframe starting from the beginning of the current month until now.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.ThisYear">
+            <summary>
+            Creates a timeframe starting from the beginning of the current year until now.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.ThisNMinutes(System.Int32)">
+            <summary>
+            All of the current minute and the previous completed n-1 minutes.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.ThisNHours(System.Int32)">
+            <summary>
+            All of the current hour and the previous completed n-1 hours.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.ThisNDays(System.Int32)">
+            <summary>
+            All of the current day and the previous completed n-1 days.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.ThisNWeeks(System.Int32)">
+            <summary>
+            All of the current week and the previous completed n-1 weeks.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.ThisNMonths(System.Int32)">
+            <summary>
+            All the current month and previous completed n-1 months.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.ThisNYears(System.Int32)">
+            <summary>
+            All the current year and previous completed n-1 years.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.PreviousNMinutes(System.Int32)">
+            <summary>
+            Gives a start of n-minutes before the most recent complete minute and an end at the
+            most recent complete minute. 
+            <para>Example: If right now it is 7:15:30pm and I specify “previous_3_minutes”, the
+            timeframe would stretch from 7:12pm until 7:15pm.</para>
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.PreviousNHours(System.Int32)">
+            <summary>
+            Gives a start of n-hours before the most recent complete hour and an end at the most
+            recent complete hour. 
+            <para>Example: If right now it is 7:15pm and I specify “previous_7_hours”, the
+            timeframe would stretch from noon until 7:00pm.</para>
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.PreviousNDays(System.Int32)">
+            <summary>
+            Gives a starting point of n-days before the most recent complete day and an end at the
+            most recent complete day. 
+            <para>Example: If right now is Friday at 9:00am and I specify a timeframe of
+            “previous_3_days”, the timeframe would stretch from Tuesday morning at 12:00am until
+            Thursday night at midnight.</para>
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.PreviousNWeeks(System.Int32)">
+            <summary>
+            Gives a start of n-weeks before the most recent complete week and an end at the most
+            recent complete week. 
+            <para>Example: If right now is Monday and I specify a timeframe of “previous_2_weeks”,
+            the timeframe would stretch from three Sunday mornings ago at 12:00am until the most
+            recent Sunday at 12:00am. (yesterday morning)</para>
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.PreviousNMonths(System.Int32)">
+            <summary>
+            Gives a start of n-months before the most recent completed month and an end at the most
+            recent completed month. 
+            <para>Example: If right now is the 5th of the month and I specify a timeframe of
+            “previous_2_months”, the timeframe would stretch from the start of two months ago until
+            the end of last month.</para>
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.PreviousNYears(System.Int32)">
+            <summary>
+            Gives a start of n-years before the most recent completed year and an end at the most
+            recent completed year. 
+            <para>Example: If right now is the June 5th and I specify a timeframe of
+            “previous_2_years”, the timeframe would stretch from the start of two years ago until
+            the end of last year.</para>
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.PreviousMinute">
+            <summary>
+            convenience for “previous_1_minute”
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.PreviousHour">
+            <summary>
+            convenience for “previous_1_hour”
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.Yesterday">
+            <summary>
+            convenience for “previous_1_day”
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.PreviousWeek">
+            <summary>
+            convenience for “previous_1_week”
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.PreviousMonth">
+            <summary>
+            convenience for “previous_1_months”
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryRelativeTimeframe.PreviousYear">
+            <summary>
+            convenience for “previous_1_years”
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryType.Count">
+            <summary>
+            Returns the number of resources in the event collection. Parameter targetProperty is ignored.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryType.CountUnique">
+            <summary>
+            Returns the number of unique resources in the event collection.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryType.Minimum">
+            <summary>
+            Returns the minimum value for the target property in the event collection.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryType.Maximum">
+            <summary>
+            Returns the maximum value for the target property in the event collection.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryType.Average">
+            <summary>
+            Returns the average across all numeric values for the target property.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryType.Sum">
+            <summary>
+            Returns the sum of all numeric resources in the event collection.
+            </summary>
+        </member>
+        <member name="M:Keen.Query.QueryType.SelectUnique">
+            <summary>
+            Returns a list of unique resources in the event collection.
+            </summary>
+        </member>
+        <member name="T:Keen.Query.TimeframeConverter">
+            <summary>
+            Used for converting IQueryTimeframe instances to/from JSON.
+            </summary>
+        </member>
+    </members>
+</doc>

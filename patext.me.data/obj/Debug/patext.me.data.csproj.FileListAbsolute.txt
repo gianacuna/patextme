@@ -1,0 +1,5 @@
+C:\apps\patext.me\patext.me.data\bin\Debug\patext.me.data.dll
+C:\apps\patext.me\patext.me.data\bin\Debug\patext.me.data.pdb
+C:\apps\patext.me\patext.me.data\obj\Debug\patext.me.data.csprojResolveAssemblyReference.cache
+C:\apps\patext.me\patext.me.data\obj\Debug\patext.me.data.dll
+C:\apps\patext.me\patext.me.data\obj\Debug\patext.me.data.pdb
